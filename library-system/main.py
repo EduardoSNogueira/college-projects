@@ -1,4 +1,6 @@
 from datetime import date, timedelta
+import csv
+import os
 
 livros = {};
 usuarios = {};
@@ -140,44 +142,74 @@ def devolverLivro(livros):
     print("Livro devolvido!")
     print("="*30)
 
+#====================== SALVAR E CARREGAR ======================
 
-# MENU
+def salvarCsv(livros):
+    with open("relatorio.csv", "w", newline="", encoding="utf-8") as arquivo:
+        escritor = csv.writer(arquivo)
 
-def menu():
-    while True:
-        print("\n" + "="*38)
-        print("   SISTEMA DE EMPRESTIMO BIBLIOTECA   ")
-        print("="*38)
-        print("1. Cadastrar livro")
-        print("2. Cadastrar usuário")
-        print("3. Consultar livros")
-        print("4. Emprestar livro")
-        print("5. Devolver Livro")
-        print("6. Gerar relatório")
-        print("7. Salvar")
-        print("8. SAIR")
-        print("="*38)
-        opcao = input("").strip()
+        escritor.writerow([            
+            "codigo",
+            "titulo",
+            "situacao",
+            "aluno",
+            "matricula",
+            "devolucao"
+        ])
 
-        match opcao:
-            case "1":
-                cadastrarLivro(livros)
-            case "2":
-                cadastrarUsuario(usuarios)
-            case "3":
-                consultarLivros(livros)
-            case "4":
-                emprestarLivro(livros, usuarios)
-            case "5":
-                devolverLivro(livros)
-            case "6":
-                relatorio(livros)
-            case "7":
-                salvarCsv(livros)
-            case "8":
-                print("Saindo... ate logo")
-                break
-            case _:
-                print("ERRO: Opção Invalida")
+        for codigo, dados in livros.items():
 
-menu()
+            devolucao = ""
+
+            if dados["devolucao"]:
+                devolucao = dados["devolucao"].strftime("%d/%m/%Y")
+            escritor.writerow([
+                codigo,
+                dados["titulo"],
+                dados["situacao"],
+                dados["aluno"],
+                dados["matricula"],
+                devolucao
+            ])
+
+    print("Salvo com sucesso!")
+
+
+#====================== MENU ======================
+
+
+while True:
+    print("\n" + "="*38)
+    print("   SISTEMA DE EMPRESTIMO BIBLIOTECA   ")
+    print("="*38)
+    print("1. Cadastrar livro")
+    print("2. Cadastrar usuário")
+    print("3. Consultar livros")
+    print("4. Emprestar livro")
+    print("5. Devolver Livro")
+    print("6. Gerar relatório")
+    print("7. Salvar")
+    print("8. SAIR")
+    print("="*38)
+    opcao = input("").strip()
+
+    match opcao:
+        case "1":
+            cadastrarLivro(livros)
+        case "2":
+            cadastrarUsuario(usuarios)
+        case "3":
+            consultarLivros(livros)
+        case "4":
+            emprestarLivro(livros, usuarios)
+        case "5":
+            devolverLivro(livros)
+        case "6":
+            relatorio(livros)
+        case "7":
+            salvarCsv(livros)
+        case "8":
+            print("Saindo... ate logo")
+            break
+        case _:
+            print("ERRO: Opção Invalida")
