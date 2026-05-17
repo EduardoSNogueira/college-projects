@@ -2,8 +2,10 @@
 livros = {};
 usuarios = {};
 
+# CADASTRO
+ 
 def cadastrarLivro(livros):
-    codigo = input("Código do Livro: ").strip()
+    codigo = input("Código do Livro(ISBN): ").strip() #implementar verificação do isbn 13 digitos
     if codigo in livros:
         print("ERRO: Este código já foi cadastrado")
         return
@@ -12,7 +14,11 @@ def cadastrarLivro(livros):
     livros[codigo] = {
         "titulo": titulo,
         "situacao": "disponivel",
+        "aluno": "",
+        "matricula": "",
+        "devolucao": ""
     }
+
     print("Livro cadastrado! ")
 
 def cadastrarUsuario(usuarios):
@@ -27,12 +33,27 @@ def cadastrarUsuario(usuarios):
         }
     print("Usuario cadastrado! ")
 
+#LEITURA
+
+def consultarLivros(livros):
+    if not livros:
+        print("Nenhum livro no banco de dados.")
+        return
+    
+    for codigo, dados in livros.items():
+        print(f"""
+Código:   {codigo}
+Título:   {dados['titulo']}
+Situação: {dados['situacao']}             
+        """)
 
 # MENU
 
 def menu():
     while True:
-        print("\n   SISTEMA DE EMPRESTIMO BIBLIOTECA   ")
+        print("="*38)
+        print("   SISTEMA DE EMPRESTIMO BIBLIOTECA   ")
+        print("="*38)
         print("1. Cadastrar livro")
         print("2. Cadastrar usuário")
         print("3. Consultar livros")
@@ -41,7 +62,7 @@ def menu():
         print("6. Gerar relatório")
         print("7. Salvar")
         print("8. SAIR")
-
+        print("="*38)
         opcao = input("").strip()
 
         match opcao:
