@@ -48,6 +48,23 @@ Título:   {dados['titulo']}
 Situação: {dados['situacao']}             
         """)
 
+def relatorio(livros):
+    if not livros:
+        print("Nenhum livro no banco de dados.")
+        return
+    
+    print("\n===== RELATÓRIO =====")
+
+    for codigo, dados in livros.items():
+        print(f"""
+Código: {codigo}
+Título: {dados['titulo']}
+Situação: {dados['situacao']}
+Aluno: {dados['aluno']}
+Matrícula: {dados['matricula']}
+Devolução: {dados['devolucao']}
+        """)
+
 #ESCRITA
 
 def emprestarLivro(livros, usuarios):
@@ -66,12 +83,12 @@ def emprestarLivro(livros, usuarios):
         print("Aluno não encontrado!")
         return
     
-    devolucao = date.today() + timedelta(days=15)
+    dataDevolucao = date.today() + timedelta(days=15)
 
     livros[codigo]["situacao"] = "emprestado"
     livros[codigo]["aluno"] = usuarios[matricula]["nome"]
     livros[codigo]["matricula"] = matricula
-    livros[codigo]["devolucao"] = devolucao
+    livros[codigo]["devolucao"] = dataDevolucao
 
     print("\n" + "="*30)
     print("   COMPROVANTE DE EMPRÉSTIMO   ")
@@ -80,7 +97,7 @@ def emprestarLivro(livros, usuarios):
     print(f"Código: {codigo}")
     print(f"Aluno: {livros[codigo]['aluno']}")
     print(f"Matrícula: {matricula}")
-    print(f"Data de Devolução: {devolucao.strftime('%d/%m/%Y')}")
+    print(f"Data de Devolução: {dataDevolucao.strftime('%d/%m/%Y')}")
     print("="*30)
 
 def devolverLivro(livros):
@@ -106,7 +123,7 @@ def devolverLivro(livros):
 
     if hoje > dataDevolucao:
         diasAtraso = (hoje - dataDevolucao).days
-        valorMultaDia = 1,25
+        valorMultaDia = 1.25
         valorMultaTotal = valorMultaDia * diasAtraso
 
         print(f"Status: Dias de atraso: ({diasAtraso} dias)")
@@ -154,9 +171,9 @@ def menu():
             case "5":
                 devolverLivro(livros)
             case "6":
-                relatorio(livros, usuarios)
+                relatorio(livros)
             case "7":
-                salvarCsv(livros, usuarios)
+                salvarCsv(livros)
             case "8":
                 print("Saindo... ate logo")
                 break
