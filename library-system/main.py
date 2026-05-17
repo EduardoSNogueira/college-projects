@@ -3,7 +3,7 @@ from datetime import date, timedelta
 livros = {};
 usuarios = {};
 
-# CADASTRO
+# CADASTRO 
  
 def cadastrarLivro(livros):
     codigo = input("Código do Livro(ISBN): ").strip() #implementar verificação do isbn 13 digitos
@@ -48,6 +48,8 @@ Título:   {dados['titulo']}
 Situação: {dados['situacao']}             
         """)
 
+#ESCRITA
+
 def emprestarLivro(livros, usuarios):
     codigo = input("Código do Livro: ")
     if codigo not in livros:
@@ -80,6 +82,47 @@ def emprestarLivro(livros, usuarios):
     print(f"Matrícula: {matricula}")
     print(f"Data de Devolução: {devolucao.strftime('%d/%m/%Y')}")
     print("="*30)
+
+def devolverLivro(livros):
+    codigo = input("Digite o codigo do livro: ")
+    
+    if codigo not in livros:
+        print("Livro não encontrado!")
+        return
+        
+    if livros[codigo]["situacao"] == "disponivel":
+        print("Este livro não esta emprestado!")
+        return
+    
+    print("\n" + "="*30)
+    print("   COMPROVANTE DE DEVOLUÇÃO   ")
+    print("="*30)
+    print(f"Livro: {livros[codigo]['titulo']}")
+    print(f"Código: {codigo}")
+    print(f"Aluno: {livros[codigo]['aluno']}")
+    
+    hoje = date.today()
+    dataDevolucao = livros[codigo]['devolucao']
+
+    if hoje > dataDevolucao:
+        diasAtraso = (hoje - dataDevolucao).days
+        valorMultaDia = 1,25
+        valorMultaTotal = valorMultaDia * diasAtraso
+
+        print(f"Status: Dias de atraso: ({diasAtraso} dias)")
+        print(f"Multa por atraso: R$ {valorMultaTotal:.2f}")
+    else:
+        print("Status: Devolução dentro do prazo. Sem multas.")
+
+
+    livros[codigo]["situacao"] = "disponivel"
+    livros[codigo]["aluno"] = ""
+    livros[codigo]["matricula"] = ""
+    livros[codigo]["devolucao"] = ""
+
+    print("Livro devolvido!")
+    print("="*30)
+
 
 # MENU
 
