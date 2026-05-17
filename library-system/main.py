@@ -2,16 +2,15 @@ from datetime import date, datetime, timedelta
 import csv
 import os
 
-livros = {};
-usuarios = {};
+livros = {}
+usuarios = {}
 
-#====================== CARREGAR ======================
+#======================   CARREGAR   ======================
     
 def carregarDados():
     global livros, usuarios
-
     # Carrega Livros
-    if os.path.exists("livros.csv"):
+    if os.path.exists("livros.csv"): #verifica se o arquivo existe 
         with open("livros.csv", "r", encoding= "utf-8") as arquivo:
             leitor = csv.DictReader(arquivo)
             for linha in leitor:
@@ -29,7 +28,7 @@ def carregarDados():
                 }
     
     # Carrega Usuarios
-    if os.path.exists("usuarios.csv"):
+    if os.path.exists("usuarios.csv"): #verifica se o arquivo existe 
         with open("usuarios.csv", "r", encoding= "utf-8") as arquivo:
             leitor = csv.DictReader(arquivo)
             for linha in leitor:
@@ -38,7 +37,7 @@ def carregarDados():
                     "nome": linha["nome"]
                 }
 
-#====================== SALVAR ======================
+#======================    SALVAR    ======================
 
 def salvarCsv(livros):
     # Salvar Livros
@@ -68,7 +67,7 @@ def salvarCsv(livros):
                 devolucao
             ])
     #Salvar Usuarios
-    with open("usuarios.csv", "w", encoding="utf-8") as arquivo:
+    with open("usuarios.csv", "w", newline="", encoding="utf-8") as arquivo:
         escritor = csv.writer(arquivo)
 
         escritor.writerow([
@@ -84,11 +83,12 @@ def salvarCsv(livros):
 
     print("Salvo com sucesso!")
 
-#====================== CADASTRO ====================== 
+#======================   CADASTRO   ====================== 
 
+    # Cadastra Livro
 def cadastrarLivro(livros):
-    codigo = input("Código do Livro(ISBN): ").strip() #implementar verificação do isbn 13 digitos
-    if codigo in livros:
+    codigo = input("Código do Livro: ").strip()
+    if codigo in livros: #verifica se codigo existe
         print("ERRO: Este código já foi cadastrado")
         return
     
@@ -103,9 +103,10 @@ def cadastrarLivro(livros):
 
     print("Livro cadastrado! ")
 
+    # Cadastra Usuario
 def cadastrarUsuario(usuarios):
     matricula = input("Número de Matrícula: ").strip()
-    if matricula in usuarios:
+    if matricula in usuarios: #verifica se matricula ja existe
         print("ERRO: Esta matrícula ja foi cadastrada")
         return
     
@@ -115,10 +116,10 @@ def cadastrarUsuario(usuarios):
         }
     print("Usuario cadastrado! ")
 
-#====================== LEITURA ====================== 
+#======================    RELATORIOS    ====================== 
 
 def consultarLivros(livros):
-    if not livros:
+    if not livros: #verifica se a biblioteca livros esta vazia
         print("Nenhum livro no banco de dados.")
         return
     
@@ -130,7 +131,7 @@ Situação: {dados["situacao"]}
         """)
 
 def consultarUsuario(usuarios):
-    if not usuarios:
+    if not usuarios: #verifica se a biblioteca usuarios esta vazia
         print("Nenhum aluno cadastrado")
         return
     
@@ -148,34 +149,38 @@ def relatorio(livros):
     print("\n===== RELATÓRIO =====")
 
     for codigo, dados in livros.items():
+
+        dataFormatada = "-" #converte data 
+        if isinstance(dados["devolucao"], date):
+            dataFormatada = dados["devolucao"].strftime("%d/%m/%Y")
+
         print(f"""
 Código: {codigo}
 Título: {dados["titulo"]}
 Situação: {dados["situacao"]}
 Aluno: {dados["aluno"]}
 Matrícula: {dados["matricula"]}
-Devolução: {dados["devolucao"]}
+Devolução: {dataFormatada}
         """)
 
-#====================== ESCRITA ====================== 
+#====================== MOVIMENTACAO ====================== 
 
 def emprestarLivro(livros, usuarios):
     codigo = input("Código do Livro: ")
-    if codigo not in livros:
+    if codigo not in livros: #verifica se o codigo exite
         print("Livro não encontrado!")
         return
     
-    if livros[codigo]["situacao"] == "emprestado":
+    if livros[codigo]["situacao"] == "emprestado": #verifica se livro esta disponivel
         print("Este livro esta emprestado!")
         return
     
     matricula = input("Numero da Matricula: ")
-
-    if matricula not in usuarios:
+    if matricula not in usuarios: #verifica se a matricula exite
         print("Aluno não encontrado!")
         return
     
-    dataDevolucao = date.today() + timedelta(days=15)
+    dataDevolucao = date.today() + timedelta(days=15) #estipula prazo de devolucao
 
     livros[codigo]["situacao"] = "emprestado"
     livros[codigo]["aluno"] = usuarios[matricula]["nome"]
@@ -194,25 +199,25 @@ def emprestarLivro(livros, usuarios):
 
 def devolverLivro(livros):
     codigo = input("Digite o codigo do livro: ")
-    
-    if codigo not in livros:
+    if codigo not in livros: #verifica se o livro esta no banco de dados
         print("Livro não encontrado!")
         return
         
-    if livros[codigo]["situacao"] == "disponivel":
+    if livros[codigo]["situacao"] == "disponivel": #verifica se o livro tava emprestado
         print("Este livro não esta emprestado!")
         return
     
     print("\n" + "="*30)
     print("   COMPROVANTE DE DEVOLUÇÃO   ")
     print("="*30)
-    print(f"Livro: {livros[codigo]["titulo"]}")
+    print(f"Livro: {livros[codigo]['titulo']}")
     print(f"Código: {codigo}")
-    print(f"Aluno: {livros[codigo]["aluno"]}")
+    print(f"Aluno: {livros[codigo]['aluno']}")
     
     hoje = date.today()
     dataDevolucao = livros[codigo]["devolucao"]
 
+    #estipula multa por atraso se ultrapassar o prazo estipulado por dataDevolucao
     if hoje > dataDevolucao:
         diasAtraso = (hoje - dataDevolucao).days
         valorMultaDia = 1.25
@@ -232,7 +237,7 @@ def devolverLivro(livros):
     print("Livro devolvido!")
     print("="*30)
 
-#====================== MENU ======================
+#======================     MENU     ======================
 
 carregarDados()
 
@@ -250,7 +255,7 @@ while True:
     print("8. Salvar")
     print("9. SAIR")
     print("="*38)
-    opcao = input("").strip()
+    opcao = input("Opção: ").strip()
 
     match opcao:
         case "1":
