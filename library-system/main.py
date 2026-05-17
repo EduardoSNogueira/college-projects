@@ -1,12 +1,91 @@
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 import csv
 import os
 
 livros = {};
 usuarios = {};
 
-# CADASTRO 
- 
+#====================== CARREGAR ======================
+    
+def carregarDados():
+    global livros, usuarios
+
+    # Carrega Livros
+    if os.path.exists("livros.csv"):
+        with open("livros.csv", "r", encoding= "utf-8") as arquivo:
+            leitor = csv.DictReader(arquivo)
+            for linha in leitor:
+            
+                dataDevolucao = ""
+                if linha ["devolucao"]:
+                    dataDevolucao = datetime.strptime(linha["devolucao"], "%d/%m/%Y" ).date()
+            
+                livros[linha["codigo"]] ={
+                    "titulo": linha["titulo"],
+                    "situacao": linha["situacao"],
+                    "aluno": linha["aluno"],
+                    "matricula": linha["matricula"],
+                    "devolucao": dataDevolucao
+                }
+    
+    # Carrega Usuarios
+    if os.path.exists("usuarios.csv"):
+        with open("usuarios.csv", "r", encoding= "utf-8") as arquivo:
+            leitor = csv.DictReader(arquivo)
+            for linha in leitor:
+
+                usuarios[linha["matricula"]] ={
+                    "nome": linha["nome"]
+                }
+
+#====================== SALVAR ======================
+
+def salvarCsv(livros):
+    # Salvar Livros
+    with open("livros.csv", "w", newline="", encoding="utf-8") as arquivo:
+        escritor = csv.writer(arquivo)
+
+        escritor.writerow([            
+            "codigo",
+            "titulo",
+            "situacao",
+            "aluno",
+            "matricula",
+            "devolucao"
+        ])
+
+        for codigo, dados in livros.items():
+            devolucao = ""
+            if dados["devolucao"]:
+                devolucao = dados["devolucao"].strftime("%d/%m/%Y")
+
+            escritor.writerow([
+                codigo,
+                dados["titulo"],
+                dados["situacao"],
+                dados["aluno"],
+                dados["matricula"],
+                devolucao
+            ])
+    #Salvar Usuarios
+    with open("usuarios.csv", "w", encoding="utf-8") as arquivo:
+        escritor = csv.writer(arquivo)
+
+        escritor.writerow([
+            "matricula", 
+            "nome"
+        ])
+        for matricula, dados in usuarios.items():
+            
+            escritor.writerow([
+                matricula,
+                dados["nome"]
+            ])
+
+    print("Salvo com sucesso!")
+
+#====================== CADASTRO ====================== 
+
 def cadastrarLivro(livros):
     codigo = input("Código do Livro(ISBN): ").strip() #implementar verificação do isbn 13 digitos
     if codigo in livros:
@@ -36,7 +115,7 @@ def cadastrarUsuario(usuarios):
         }
     print("Usuario cadastrado! ")
 
-#LEITURA
+#====================== LEITURA ====================== 
 
 def consultarLivros(livros):
     if not livros:
@@ -46,8 +125,19 @@ def consultarLivros(livros):
     for codigo, dados in livros.items():
         print(f"""
 Código:   {codigo}
-Título:   {dados['titulo']}
-Situação: {dados['situacao']}             
+Título:   {dados["titulo"]}
+Situação: {dados["situacao"]}             
+        """)
+
+def consultarUsuario(usuarios):
+    if not usuarios:
+        print("Nenhum aluno cadastrado")
+        return
+    
+    for matricula, dados in usuarios.items():
+        print(f"""
+Matricula: {matricula}
+Nome:      {dados["nome"]}        
         """)
 
 def relatorio(livros):
@@ -60,14 +150,14 @@ def relatorio(livros):
     for codigo, dados in livros.items():
         print(f"""
 Código: {codigo}
-Título: {dados['titulo']}
-Situação: {dados['situacao']}
-Aluno: {dados['aluno']}
-Matrícula: {dados['matricula']}
-Devolução: {dados['devolucao']}
+Título: {dados["titulo"]}
+Situação: {dados["situacao"]}
+Aluno: {dados["aluno"]}
+Matrícula: {dados["matricula"]}
+Devolução: {dados["devolucao"]}
         """)
 
-#ESCRITA
+#====================== ESCRITA ====================== 
 
 def emprestarLivro(livros, usuarios):
     codigo = input("Código do Livro: ")
@@ -116,12 +206,12 @@ def devolverLivro(livros):
     print("\n" + "="*30)
     print("   COMPROVANTE DE DEVOLUÇÃO   ")
     print("="*30)
-    print(f"Livro: {livros[codigo]['titulo']}")
+    print(f"Livro: {livros[codigo]["titulo"]}")
     print(f"Código: {codigo}")
-    print(f"Aluno: {livros[codigo]['aluno']}")
+    print(f"Aluno: {livros[codigo]["aluno"]}")
     
     hoje = date.today()
-    dataDevolucao = livros[codigo]['devolucao']
+    dataDevolucao = livros[codigo]["devolucao"]
 
     if hoje > dataDevolucao:
         diasAtraso = (hoje - dataDevolucao).days
@@ -142,41 +232,9 @@ def devolverLivro(livros):
     print("Livro devolvido!")
     print("="*30)
 
-#====================== SALVAR E CARREGAR ======================
-
-def salvarCsv(livros):
-    with open("relatorio.csv", "w", newline="", encoding="utf-8") as arquivo:
-        escritor = csv.writer(arquivo)
-
-        escritor.writerow([            
-            "codigo",
-            "titulo",
-            "situacao",
-            "aluno",
-            "matricula",
-            "devolucao"
-        ])
-
-        for codigo, dados in livros.items():
-
-            devolucao = ""
-
-            if dados["devolucao"]:
-                devolucao = dados["devolucao"].strftime("%d/%m/%Y")
-            escritor.writerow([
-                codigo,
-                dados["titulo"],
-                dados["situacao"],
-                dados["aluno"],
-                dados["matricula"],
-                devolucao
-            ])
-
-    print("Salvo com sucesso!")
-
-
 #====================== MENU ======================
 
+carregarDados()
 
 while True:
     print("\n" + "="*38)
@@ -185,11 +243,12 @@ while True:
     print("1. Cadastrar livro")
     print("2. Cadastrar usuário")
     print("3. Consultar livros")
-    print("4. Emprestar livro")
-    print("5. Devolver Livro")
-    print("6. Gerar relatório")
-    print("7. Salvar")
-    print("8. SAIR")
+    print("4. Consultar alunos")
+    print("5. Emprestar livro")
+    print("6. Devolver Livro")
+    print("7. Gerar relatório")
+    print("8. Salvar")
+    print("9. SAIR")
     print("="*38)
     opcao = input("").strip()
 
@@ -201,14 +260,16 @@ while True:
         case "3":
             consultarLivros(livros)
         case "4":
-            emprestarLivro(livros, usuarios)
+            consultarUsuario(usuarios)
         case "5":
-            devolverLivro(livros)
+            emprestarLivro(livros, usuarios)
         case "6":
-            relatorio(livros)
+            devolverLivro(livros)
         case "7":
-            salvarCsv(livros)
+            relatorio(livros)
         case "8":
+            salvarCsv(livros)
+        case "9":
             print("Saindo... ate logo")
             break
         case _:
