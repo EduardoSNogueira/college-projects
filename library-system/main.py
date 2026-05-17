@@ -1,6 +1,6 @@
 
 livros = {};
-aluno = {};
+usuarios = {};
 
 def cadastrarLivro(livros):
     codigo = input("Código do Livro: ").strip()
@@ -13,7 +13,20 @@ def cadastrarLivro(livros):
         "titulo": titulo,
         "situacao": "disponivel",
     }
-    print("Livro cadastrado. ")
+    print("Livro cadastrado! ")
+
+def cadastrarUsuario(usuarios):
+    matricula = input("Número de Matrícula: ").strip()
+    if matricula in usuarios:
+        print("ERRO: Esta matrícula ja foi cadastrada")
+        return
+    
+    nome = input("Nome do Aluno: ").strip()
+    usuarios[matricula] = {
+        "nome": nome
+        }
+    print("Usuario cadastrado! ")
+
 
 # MENU
 
@@ -35,17 +48,17 @@ def menu():
             case "1":
                 cadastrarLivro(livros)
             case "2":
-                cadastrarUsuario(aluno)
+                cadastrarUsuario(usuarios)
             case "3":
                 consultarLivros(livros)
             case "4":
-                emprestarLivro(livros, aluno)
+                emprestarLivro(livros, usuarios)
             case "5":
                 devolverLivro(livros)
             case "6":
-                relatorio(livros, aluno)
+                relatorio(livros, usuarios)
             case "7":
-                salvarCsv(livros, aluno)
+                salvarCsv(livros, usuarios)
             case "8":
                 print("Saindo... ate logo")
                 break
