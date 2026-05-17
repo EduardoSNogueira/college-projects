@@ -1,3 +1,4 @@
+from datetime import date, timedelta
 
 livros = {};
 usuarios = {};
@@ -47,11 +48,44 @@ Título:   {dados['titulo']}
 Situação: {dados['situacao']}             
         """)
 
+def emprestarLivro(livros, usuarios):
+    codigo = input("Código do Livro: ")
+    if codigo not in livros:
+        print("Livro não encontrado!")
+        return
+    
+    if livros[codigo]["situacao"] == "emprestado":
+        print("Este livro esta emprestado!")
+        return
+    
+    matricula = input("Numero da Matricula: ")
+
+    if matricula not in usuarios:
+        print("Aluno não encontrado!")
+        return
+    
+    devolucao = date.today() + timedelta(days=15)
+
+    livros[codigo]["situacao"] = "emprestado"
+    livros[codigo]["aluno"] = usuarios[matricula]["nome"]
+    livros[codigo]["matricula"] = matricula
+    livros[codigo]["devolucao"] = devolucao
+
+    print("\n" + "="*30)
+    print("   COMPROVANTE DE EMPRÉSTIMO   ")
+    print("="*30)
+    print(f"Livro: {livros[codigo]['titulo']}")
+    print(f"Código: {codigo}")
+    print(f"Aluno: {livros[codigo]['aluno']}")
+    print(f"Matrícula: {matricula}")
+    print(f"Data de Devolução: {devolucao.strftime('%d/%m/%Y')}")
+    print("="*30)
+
 # MENU
 
 def menu():
     while True:
-        print("="*38)
+        print("\n" + "="*38)
         print("   SISTEMA DE EMPRESTIMO BIBLIOTECA   ")
         print("="*38)
         print("1. Cadastrar livro")
