@@ -1,4 +1,22 @@
 
+livros = {};
+aluno = {};
+
+def cadastrarLivro(livros):
+    codigo = input("Código do Livro: ").strip()
+    if codigo in livros:
+        print("ERRO: Este código já foi cadastrado")
+        return
+    
+    titulo = input("Título: ").strip()
+    livros[codigo] = {
+        "titulo": titulo,
+        "situacao": "disponivel",
+    }
+    print("Livro cadastrado. ")
+
+# MENU
+
 def menu():
     while True:
         print("\n   SISTEMA DE EMPRESTIMO BIBLIOTECA   ")
@@ -33,3 +51,5 @@ def menu():
                 break
             case _:
                 print("ERRO: Opção Invalida")
+
+menu()
